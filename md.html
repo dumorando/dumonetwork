@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dumos markdown viewer</title>
+    <script src="https://services.dumorando.com/DumoJS.php"></script>
+    <style>
+        body {
+            padding: 50px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Loading..</h1>
+    </div>
+    <script>
+        console.log(window.location.search);
+        fetch(`/docs/${window.location.search.split("?")[1]}.md`)
+            .then(a => a.text())
+            .then(data => {
+                DumoJS.load_library_sync("marked");
+                document.getElementById('container').innerHTML = marked.parse(data);
+
+                //get the title of the doc
+                const tokens = marked.lexer(data);
+                for (const token of tokens) {
+                    if (token.type == 'heading' && token.depth == 1) {
+                        document.querySelector('title').innerText = token.text;
+                        break;
+                    }
+                }
+            });
+    </script>
+</body>
+</html>
